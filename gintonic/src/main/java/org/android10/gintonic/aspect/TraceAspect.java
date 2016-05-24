@@ -39,30 +39,9 @@ public class TraceAspect {
   @Pointcut(POINTCUT_METHOD_MAINACTIVITY)
   public void methodAnootatedWith(){}
 
-    /**
-     * 在截获的目标方法调用之前执行该Advise
-     * @param joinPoint
-     * @throws Throwable
-     */
-  @TargetApi(Build.VERSION_CODES.LOLLIPOP)
-  @Before("methodAnootatedWith()")
-  public void onCreateBefore(JoinPoint joinPoint) throws Throwable{
-      Activity activity = null;
-      //获取目标对象
-      activity = ((Activity)joinPoint.getTarget());
-      //插入自己的实现，控制目标对象的执行
-      ChooseDialog dialog = new ChooseDialog(activity);
-      dialog.show();
 
-      //做其他的操作
-      buildLogMessage("test",20);
-  }
-  @After("methodAnootatedWith()")
-  public void onCreateAfter(JoinPoint joinPoint) throws Throwable{
-      Log.e("onCreateAfter:","onCreate is end .");
-  }
     /**
-     * 在截获的目标方法调用返回之后（无论正常还是异常）执行该Advise
+     *  截获原方法，并替换
      * @param joinPoint
      * @return
      * @throws Throwable
@@ -88,11 +67,11 @@ public class TraceAspect {
       className = joinPoint.getThis().getClass().getName();
 
       String methodName = methodSignature.getName();
-      String msg =  buildLogMessage(methodName, stopWatch.getTotalTimeMicros());
+      String msg =  buildLogMessage(methodName, stopWatch.getTotalTime(1));
     if (currentObject != null && currentObject.equals(joinPoint.getTarget())){
-        DebugLog.log(new MethodMsg(className,msg,stopWatch.getTotalTimeMicros()));
+        DebugLog.log(new MethodMsg(className,msg,stopWatch.getTotalTime(1)));
     }else if(currentObject != null && !currentObject.equals(joinPoint.getTarget())){
-        DebugLog.log(new MethodMsg(className, msg,stopWatch.getTotalTimeMicros()));
+        DebugLog.log(new MethodMsg(className, msg,stopWatch.getTotalTime(1)));
         Log.e(className,msg);
         currentObject = joinPoint.getTarget();
 //        DebugLog.outPut(new Path());    //日志存储
@@ -101,6 +80,28 @@ public class TraceAspect {
     return result;
   }
 
+    @After("methodAnootatedWith()")
+    public void onCreateAfter(JoinPoint joinPoint) throws Throwable{
+        Log.e("onCreateAfter:","onCreate is end .");
+    }
+    /**
+     * 在截获的目标方法调用之前执行该Advise
+     * @param joinPoint
+     * @throws Throwable
+     */
+    @TargetApi(Build.VERSION_CODES.LOLLIPOP)
+    @Before("methodAnootatedWith()")
+    public void onCreateBefore(JoinPoint joinPoint) throws Throwable{
+        Activity activity = null;
+        //获取目标对象
+        activity = ((Activity)joinPoint.getTarget());
+        //插入自己的实现，控制目标对象的执行
+        ChooseDialog dialog = new ChooseDialog(activity);
+        dialog.show();
+
+        //做其他的操作
+        buildLogMessage("test",20);
+    }
   /**
    * 创建一个日志信息
    *
@@ -108,7 +109,7 @@ public class TraceAspect {
    * @param methodDuration 执行时间
    * @return
    */
-  private static String buildLogMessage(String methodName, long methodDuration) {
+  private static String buildLogMessage(String methodName, double methodDuration) {
     StringBuilder message = new StringBuilder();
     message.append(methodName);
     message.append(" --> ");
