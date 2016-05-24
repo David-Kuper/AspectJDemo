@@ -37,17 +37,17 @@ public class StopWatch {
       reset();
     }
   }
-  public long getTotalTime(int type){
+  public double getTotalTime(int type){
     if (type == 1){
       return getTotalTimeMillis();
     }else{
       return getTotalTimeMicros();
     }
   }
-  public long getTotalTimeMicros() {
-    return (elapsedTime != 0) ? TimeUnit.NANOSECONDS.toMicros(endTime - startTime) : 0;
+  public double getTotalTimeMicros() {
+    return (elapsedTime != 0) ? (endTime - startTime) /1000.0 : 0;
   }
-  public long getTotalTimeMillis(){
-    return (elapsedTime != 0) ? TimeUnit.NANOSECONDS.toMillis(endTime - startTime) : 0;
+  public double getTotalTimeMillis(){
+    return (elapsedTime != 0) ? TimeUnit.NANOSECONDS.toMicros(endTime - startTime) /1000.0: 0;
   }
 }
